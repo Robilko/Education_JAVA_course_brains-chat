@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
     private Vector<ClientHandler> clients;
     private AuthService authService;
+    private ExecutorService executorService;
 
     public AuthService getAuthService() {
         return authService;
@@ -18,18 +22,20 @@ public class Server {
     public Server() {
         clients = new Vector<>();
         authService = new SimpleAuthService();
+        executorService = Executors.newFixedThreadPool(10);
         try (ServerSocket serverSocket = new ServerSocket(8191);
             DBHelper instance = DBHelper.getInstance()) {
 
             System.out.println("Сервер запущен на порту 8189");
             while (true) {
                 Socket socket = serverSocket.accept();
-                new ClientHandler(this, socket, authService);
+                new ClientHandler(this, socket, authService, executorService);
                 System.out.println("Подключился новый клиент");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        executorService.shutdown();
         System.out.println("Сервер завершил свою работу");
     }
 
