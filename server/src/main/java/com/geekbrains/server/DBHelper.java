@@ -1,6 +1,8 @@
 package com.geekbrains.server;
 
 import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DBHelper implements AutoCloseable {
 
@@ -9,6 +11,7 @@ public class DBHelper implements AutoCloseable {
 
     private static PreparedStatement findByLoginAndPassword;
     private static PreparedStatement changeNick;
+    private static final Logger logger = Logger.getLogger(DBHelper.class.getName());
 
     private DBHelper() {}
 
@@ -27,7 +30,8 @@ public class DBHelper implements AutoCloseable {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:UserDB.db");
         } catch (ClassNotFoundException | SQLException e) {
-            System.err.println("Ошибка соединения с базой данных");
+//            System.err.println("Ошибка соединения с базой данных");
+            logger.log(Level.WARNING, "Ошибка соединения с базой данных");
             e.printStackTrace();
         }
     }
